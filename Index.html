@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Thomas Gamers — Best Game</title>
+<style>
+  :root{
+    --bg1:#dff7ff; --bg2:#eafcff;
+    --panel: #ffffffcc; --muted:#496075;
+    --accent:#ffcc00; --accent-dark:#ffb300;
+  }
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: linear-gradient(180deg,var(--bg1),var(--bg2)); color:#102a43}
+  .wrap{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:18px;gap:12px;box-sizing:border-box;}
+  header{width:100%;max-width:920px;background:var(--panel);padding:12px;border-radius:10px;box-shadow:0 10px 30px rgba(16,42,67,0.06);display:flex;justify-content:space-between;align-items:center}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(#fff,#ffd27a);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 12px rgba(16,42,67,0.06)}
+  h1{font-size:16px;margin:0}
+  main{width:100%;max-width:920px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .panel{width:100%;background:var(--panel);border-radius:12px;padding:18px;box-shadow:0 12px 36px rgba(16,42,67,0.06);display:flex;flex-direction:column;align-items:center;gap:12px}
+  .center{text-align:center}
+  .btn {
+    background: linear-gradient(180deg,var(--accent),var(--accent-dark));
+    border: none; padding:10px 16px;border-radius:10px;color:#102a43;font-weight:800;cursor:pointer;
+    box-shadow:0 8px 0 rgba(0,0,0,0.06);
+  }
+  .muted { background:white;border-radius:10px;padding:8px 12px;border:1px solid rgba(0,0,0,0.06);color:var(--muted);font-weight:700 }
+  .small { padding:7px 10px;font-size:14px;}
+  /* game area */
+  .game-wrap{width:100%;display:flex;justify-content:center;align-items:center;position:relative}
+  .canvas-holder{width: min(720px, 92vw); max-width:720px; background: linear-gradient(#bfefff,#e6f9ff); padding:10px;border-radius:12px; position:relative; box-shadow:0 12px 30px rgba(16,42,67,0.06)}
+  canvas{display:block;width:100%;height:auto;border-radius:8px;background:linear-gradient(#9be7f0,#70c5ce);box-shadow: inset 0 -40px 80px rgba(0,0,0,0.04)}
+  #scorebar{position:absolute;left:12px;top:12px;background:rgba(255,255,255,0.95);padding:8px 10px;border-radius:10px;font-weight:800;box-shadow:0 12px 30px rgba(16,42,67,0.06)}
+  .overlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.98);padding:16px;border-radius:12px;text-align:center;box-shadow:0 12px 30px rgba(16,42,67,0.08);width:86%;max-width:420px}
+  .hidden{display:none !important}
+  footer{width:100%;max-width:920px;padding:10px;text-align:center;color:var(--muted);font-size:13px}
+  @media (max-width:420px){
+    header{padding:8px} .logo{width:38px;height:38px} h1{font-size:14px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden>🎮</div>
+        <div>
+          <h1>Thomas Gamers — Best Game</h1>
+          <div style="font-size:12px;color:var(--muted)">Plappy Bird — simple & fun</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--muted)">© 2025 Thomas Gamers</div>
+    </header>
+
+    <main>
+      <div class="panel">
+
+        <!-- HOME -->
+        <div id="homeScreen" class="center">
+          <h2 style="margin:6px 0">Welcome to Thomas Gamers</h2>
+          <p style="margin:6px 0;color:#324b63">A light, simple Plappy Bird game inside your website.</p>
+          <div style="display:flex;gap:12px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+            <button class="btn" id="playBtn">Play Plappy Bird</button>
+            <button class="muted small" id="aboutBtn">About</button>
+          </div>
+        </div>
+
+        <!-- ABOUT -->
+        <div id="aboutScreen" class="center hidden">
+          <h3 style="margin:6px 0">About</h3>
+          <p style="max-width:640px;color:#324b63">Made by Sarthak for Thomas Gamers. This page includes a lightweight Plappy Bird clone built with HTML5 Canvas — tap to flap. Your best scores save per difficulty.</p>
+          <div style="margin-top:10px"><button class="muted small" id="aboutBackBtn">Back</button></div>
+        </div>
+
+        <!-- GAME WRAPPER -->
+        <div id="gameContainer" class="game-wrap hidden" aria-hidden="true">
+          <div class="canvas-holder">
+            <div id="scorebar">Score: 0</div>
+
+            <!-- Start overlay -->
+            <div id="startOverlay" class="overlay">
+              <h3 style="margin:0 0 8px 0">Get Ready</h3>
+              <p style="margin:0 0 12px 0;color:#324b63">Tap / Click / Space to flap</p>
+              <div style="display:flex;gap:8px;justify-content:center">
+                <button class="btn" id="startBtn">Start</button>
+                <button class="muted small" id="startBackBtn">Back</button>
+              </div>
+            </div>
+
+            <!-- Game canvas -->
+            <canvas id="gameCanvas" width="360" height="600" aria-label="Plappy Bird game"></canvas>
+
+            <!-- Game over overlay -->
+            <div id="gameOverOverlay" class="overlay hidden" aria-hidden="true">
+              <h3 style="margin:0 0 8px 0">Game Over</h3>
+              <p id="finalScoreText" style="margin:0 0 12px 0;color:#324b63">Score: 0</p>
+              <div style="display:flex;gap:8px;justify-content:center">
+                <button class="btn" id="restartBtn">Restart</button>
+                <button class="btn" id="backToMenuBtn">Back</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer>© 2025 Thomas Gamers • Made with ❤️ by Sarthak</footer>
+  </div>
+
+<script>
+/* ---------- Page navigation ---------- */
+const homeScreen = document.getElementById('homeScreen');
+const aboutScreen = document.getElementById('aboutScreen');
+const gameContainer = document.getElementById('gameContainer');
+const startOverlay = document.getElementById('startOverlay');
+const gameOverOverlay = document.getElementById('gameOverOverlay');
+const scorebar = document.getElementById('scorebar');
+const finalScoreText = document.getElementById('finalScoreText');
+
+document.getElementById('playBtn').addEventListener('click', ()=> {
+  homeScreen.classList.add('hidden');
+  // show game container and start overlay
+  gameContainer.classList.remove('hidden');
+  startOverlay.classList.remove('hidden');
+  gameOverOverlay.classList.add('hidden');
+  fitCanvasToHolder();
+});
+document.getElementById('aboutBtn').addEventListener('click', ()=> {
+  homeScreen.classList.add('hidden');
+  aboutScreen.classList.remove('hidden');
+});
+document.getElementById('aboutBackBtn').addEventListener('click', ()=> {
+  aboutScreen.classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+});
+document.getElementById('startBackBtn').addEventListener('click', ()=> {
+  // go back to home
+  gameContainer.classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+});
+
+/* ---------- Canvas & game setup ---------- */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// logical size
+const LOGICAL_W = 360, LOGICAL_H = 600;
+
+function fitCanvasToHolder(){
+  const holder = canvas.parentElement;
+  const cssWidth = Math.min(720, Math.max(280, holder.clientWidth - 20)); // padding allowance
+  const aspect = LOGICAL_W / LOGICAL_H;
+  const cssHeight = Math.round(cssWidth / aspect);
+  canvas.style.width = cssWidth + 'px';
+  canvas.style.height = cssHeight + 'px';
+  // high-DPI
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.round(LOGICAL_W * ratio);
+  canvas.height = Math.round(LOGICAL_H * ratio);
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+}
+window.addEventListener('resize', ()=> { if (!gameContainer.classList.contains('hidden')) fitCanvasToHolder(); });
+
+/* ---------- Game variables ---------- */
+let gameState = null; // holds current round
+let bestByDiff = {
+  easy: parseInt(localStorage.getItem('tg_best_easy')||'0',10),
+  medium: parseInt(localStorage.getItem('tg_best_medium')||'0',10),
+  hard: parseInt(localStorage.getItem('tg_best_hard')||'0',10)
+};
+const DIFF = {
+  easy:   { gravity:0.38, flap:-7.6, gap:160, speed:1.8 },
+  medium: { gravity:0.5,  flap:-8.8, gap:140, speed:2.3 },
+  hard:   { gravity:0.72, flap:-10,  gap:120, speed:2.9 }
+};
+let currentDiff = 'medium';
+
+/* ---------- state helpers ---------- */
+function makeNewState(diff){
+  const cfg = DIFF[diff];
+  return {
+    cfg,
+    bird: { x: 80, y: 300, vy: 0, size: 22 },
+    pipes: [],
+    frame: 0,
+    score: 0,
+    running: false,
+    listeners: {}
+  };
+}
+
+/* ---------- Input & controls ---------- */
+function attachGameListeners(state){
+  // tap/mouse: start/ flap
+  const onTap = function(e){
+    e.preventDefault();
+    if (!state.running) { state.running = true; state.bird.vy = state.cfg.flap; }
+    else flap(state);
+  };
+  const onSpace = function(e){
+    if (e.code === 'Space'){ e.preventDefault(); if (!state.running){ state.running = true; state.bird.vy = state.cfg.flap; } else flap(state); }
+  };
+  canvas.addEventListener('touchstart', onTap, {passive:false});
+  canvas.addEventListener('mousedown', onTap);
+  window.addEventListener('keydown', onSpace);
+  state.listeners.onTap = onTap;
+  state.listeners.onSpace = onSpace;
+}
+
+function removeGameListeners(state){
+  if (!state || !state.listeners) return;
+  canvas.removeEventListener('touchstart', state.listeners.onTap);
+  canvas.removeEventListener('mousedown', state.listeners.onTap);
+  window.removeEventListener('keydown', state.listeners.onSpace);
+  state.listeners = {};
+}
+
+/* ---------- Game functions ---------- */
+function startRound(diff){
+  currentDiff = diff || currentDiff;
+  // initialize state
+  gameState = makeNewState(currentDiff);
+  // set score display
+  scorebar.innerText = 'Score: 0';
+  // hide overlays
+  startOverlay.classList.add('hidden');
+  gameOverOverlay.classList.add('hidden');
+  // attach listeners
+  attachGameListeners(gameState);
+  fitCanvasToHolder();
+  // begin loop
+  requestAnimationFrame(gameLoop);
+}
+
+function flap(state){
+  if (!state || !state.running) return;
+  state.bird.vy = state.cfg.flap;
+}
+
+function spawnPipe(state){
+  const minTop = 60;
+  const maxTop = LOGICAL_H - state.cfg.gap - 160;
+  const top = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
+  state.pipes.push({ x: LOGICAL_W + 20, top: top, passed:false });
+}
+
+function endRound(){
+  if (!gameState) return;
+  gameState.running = false;
+  removeGameListeners(gameState);
+  // save best
+  const key = 'tg_best_' + currentDiff;
+  const prev = parseInt(localStorage.getItem(key) || '0',10);
+  if (gameState.score > prev){
+    localStorage.setItem(key, String(gameState.score));
+    bestByDiff[currentDiff] = gameState.score;
+  }
+  // show overlay
+  finalScoreText.innerText = `Score: ${gameState.score} • Best: ${Math.max(gameState.score, prev)}`;
+  gameOverOverlay.classList.remove('hidden');
+  // keep scorebar showing final score
+}
+
+/* ---------- Game loop ---------- */
+function gameLoop(){
+  if (!gameState) return;
+  const s = gameState;
+  const cfg = s.cfg;
+
+  // update
+  if (s.running){
+    s.frame++;
+    s.bird.vy += cfg.gravity;
+    s.bird.y += s.bird.vy;
+
+    // spawn pipes
+    const spawnInterval = Math.max(60, Math.round(110 - cfg.speed*14));
+    if (s.frame % spawnInterval === 0) spawnPipe(s);
+
+    // move pipes
+    for (let p of s.pipes) p.x -= cfg.speed;
+
+    // remove offscreen
+    while (s.pipes.length && s.pipes[0].x < -80) s.pipes.shift();
+
+    // collisions & scoring
+    for (let p of s.pipes){
+      const pipeLeft = p.x, pipeRight = p.x + 52;
+      const birdLeft = s.bird.x - s.bird.size/2, birdRight = s.bird.x + s.bird.size/2;
+      if (birdRight > pipeLeft && birdLeft < pipeRight){
+        // vertical check
+        if (s.bird.y - s.bird.size/2 < p.top || s.bird.y + s.bird.size/2 > p.top + cfg.gap){
+          return endRound();
+        }
+      }
+      if (!p.passed && p.x + 52 < s.bird.x - 2){
+        p.passed = true;
+        s.score++;
+        scorebar.innerText = 'Score: ' + s.score;
+      }
+    }
+
+    // ground or ceiling
+    if (s.bird.y + s.bird.size/2 > LOGICAL_H - 40 || s.bird.y - s.bird.size/2 < 0){
+      return endRound();
+    }
+  } else {
+    // small bobbing effect before start
+    s.frame++;
+    s.bird.y += Math.sin(s.frame/12) * 0.3;
+  }
+
+  // draw
+  drawFrame(s);
+
+  // next frame
+  requestAnimationFrame(gameLoop);
+}
+
+/* ---------- Drawing ---------- */
+function drawFrame(s){
+  // clear drawing area
+  ctx.clearRect(0,0,LOGICAL_W,LOGICAL_H);
+  // sky
+  ctx.fillStyle = '#9be7f0';
+  ctx.fillRect(0,0,LOGICAL_W,LOGICAL_H);
+
+  // simple clouds
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.ellipse((s.frame*0.6)%420 - 30,60,40,14,0,0,Math.PI*2);
+  ctx.ellipse((s.frame*0.4)%380 + 20,110,26,10,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // pipes
+  for (let p of s.pipes){
+    ctx.fillStyle = '#2fa64a';
+    ctx.fillRect(p.x, 0, 52, p.top);
+    ctx.fillRect(p.x, p.top + s.cfg.gap, 52, LOGICAL_H - (p.top + s.cfg.gap) - 40);
+    // rim shading
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillRect(p.x, p.top - 6, 52, 6);
+  }
+
+  // ground
+  ctx.fillStyle = '#ded895';
+  ctx.fillRect(0, LOGICAL_H - 40, LOGICAL_W, 40);
+  ctx.fillStyle = 'rgba(0,0,0,0.04)';
+  for (let i=0;i<10;i++){
+    ctx.fillRect((i*46 + (s.frame*0.5 % 46))%LOGICAL_W, LOGICAL_H - 8 - (i%3), 30, 2);
+  }
+
+  // bird - circle
+  ctx.save();
+  ctx.translate(s.bird.x, s.bird.y);
+  const rot = Math.max(Math.min(s.bird.vy / 18, 0.6), -0.6);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#ffdf4a';
+  ctx.beginPath();
+  ctx.arc(0,0, s.bird.size/2, 0, Math.PI*2);
+  ctx.fill();
+  // eye
+  ctx.beginPath();
+  ctx.fillStyle = '#222';
+  ctx.arc(6, -4, 3, 0, Math.PI*2);
+  ctx.fill();
+  // beak
+  ctx.fillStyle = '#ff8f2a';
+  ctx.beginPath();
+  ctx.moveTo(-2,2);
+  ctx.lineTo(12,0);
+  ctx.lineTo(-2,-6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/* ---------- UI buttons ---------- */
+document.getElementById('startBtn').addEventListener('click', ()=> startRound('medium'));
+document.getElementById('restartBtn').addEventListener('click', ()=> {
+  // restart with same difficulty as last played (default medium)
+  if (!gameState) startRound(currentDiff);
+  else startRound(currentDiff);
+});
+document.getElementById('backToMenuBtn').addEventListener('click', ()=> {
+  // cleanup and go home
+  if (gameState) removeGameListeners(gameState);
+  gameState = null;
+  gameContainer.classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+  // reset overlays
+  startOverlay.classList.remove('hidden');
+  gameOverOverlay.classList.add('hidden');
+});
+
+/* quick keyboard for start overlay: if user presses space there, start */
+window.addEventListener('keydown', (e)=> {
+  if (!gameContainer.classList.contains('hidden') && !gameState && (e.code === 'Space')){
+    startRound('medium');
+  }
+});
+
+/* initial UI wiring for start overlay back already above */
+document.getElementById('startBackBtn').addEventListener('click', ()=>{
+  gameContainer.classList.add('hidden');
+  homeScreen.classList.remove('hidden');
+});
+
+/* make sure canvas fits on initial load if user clicks Play quickly */
+window.addEventListener('load', ()=> { /* nothing to do until Play is pressed */ });
+
+</script>
+</body>
+</html>
